@@ -3,11 +3,11 @@ import os
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai_tools import FirecrawlSearchTool
 
-# 1. Stop CrewAI from phoning home
+# 1. Stop CrewAI from phoning home (prevents cloud freezing)
 os.environ["CREWAI_DISABLE_TELEMETRY"] = "true"
 os.environ["CREWAI_DISABLE_TRACING"] = "true"
 
-# 2. THE OVERRIDE: Force Streamlit Secrets directly into the server's OS environment
+# 2. THE OVERRIDE: Force Streamlit Secrets directly into the OS environment
 try:
     os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
     os.environ["FIRECRAWL_API_KEY"] = st.secrets["FIRECRAWL_API_KEY"]
@@ -25,11 +25,14 @@ if st.button("Generate Weekly Newsletter", type="primary"):
 
     with st.status("Initializing AI Agents...", expanded=True) as status_box:
         
-        # Tools will now silently read from os.environ
+        # --- TERMINAL DIAGNOSTIC CHECKPOINTS ---
+        print("📍 Checkpoint 1: Connecting to Firecrawl...", flush=True)
         firecrawl_search = FirecrawlSearchTool()
         
+        print("📍 Checkpoint 2: Connecting to Anthropic...", flush=True)
         my_llm = LLM(model="anthropic/claude-3-5-sonnet-20241022")
 
+        print("📍 Checkpoint 3: Waking up the Market Researcher...", flush=True)
         st.write("🕵️‍♂️ Waking up the Market Researcher...")
         researcher = Agent(
             role="Senior Financial Technology Researcher",
@@ -40,6 +43,7 @@ if st.button("Generate Weekly Newsletter", type="primary"):
             verbose=True
         )
 
+        print("📍 Checkpoint 4: Waking up the Benchmarking Analyst...", flush=True)
         st.write("📊 Waking up the Benchmarking Analyst...")
         analyst = Agent(
             role="Strategic Wealth Management Consultant",
@@ -49,6 +53,7 @@ if st.button("Generate Weekly Newsletter", type="primary"):
             verbose=True
         )
 
+        print("📍 Checkpoint 5: Waking up the AI Strategist...", flush=True)
         st.write("🤖 Waking up the AI Innovation Strategist...")
         strategist = Agent(
             role="AI Architect for Financial Services",
@@ -59,6 +64,7 @@ if st.button("Generate Weekly Newsletter", type="primary"):
             verbose=True
         )
 
+        print("📍 Checkpoint 6: Waking up the Editor...", flush=True)
         st.write("✍️ Waking up the Managing Editor...")
         editor = Agent(
             role="Managing Director at Infosys",
@@ -68,7 +74,7 @@ if st.button("Generate Weekly Newsletter", type="primary"):
             verbose=True
         )
 
-        # Define the Tasks
+        print("📍 Checkpoint 7: Defining Tasks...", flush=True)
         task_research = Task(
             description="Use Firecrawl to search the web for the latest 30-day news on BNY's Wove platform, legacy competitors (Envestnet, Orion), and fintechs (Altruist, Betterment).",
             expected_output="A summary of the latest features, API integrations, and pricing models in the wealthtech space.",
@@ -93,7 +99,7 @@ if st.button("Generate Weekly Newsletter", type="primary"):
             agent=editor
         )
 
-        # Assemble the Crew
+        print("📍 Checkpoint 8: Assembling Crew and Kickoff!", flush=True)
         st.write("🚀 Kickoff! Agents are now researching and writing...")
         newsletter_crew = Crew(
             agents=[researcher, analyst, strategist, editor],
@@ -105,6 +111,7 @@ if st.button("Generate Weekly Newsletter", type="primary"):
         # Run the workflow
         final_newsletter = newsletter_crew.kickoff()
         
+        print("📍 Checkpoint 9: Success!", flush=True)
         status_box.update(label="Newsletter Generated Successfully!", state="complete", expanded=False)
 
     # 5. Display the final result
