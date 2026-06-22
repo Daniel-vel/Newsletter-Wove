@@ -1,32 +1,24 @@
 import streamlit as st
 import os
-from dotenv import load_dotenv
 from crewai import Agent, Task, Crew, Process
 from crewai_tools import FirecrawlSearchTool
 
-# 1. Load the API keys from the .env file
-load_dotenv()
-
-# 2. Set up the Streamlit User Interface
+# 1. Set up the Streamlit User Interface
 st.set_page_config(page_title="Wove Competitive Intelligence", page_icon="📊", layout="centered")
 st.title("Wove Benchmarking & AI Newsletter Agent")
 st.markdown("Generates a weekly strategic newsletter comparing BNY's Wove against legacy banks and modern fintechs.")
 
-# 3. Initialize the Firecrawl Search Tool
-# This automatically uses the FIRECRAWL_API_KEY from your .env file
-firecrawl_search = FirecrawlSearchTool()
-
-# 4. The Button that triggers the agents
+# 2. The Button that triggers the agents
 if st.button("Generate Weekly Newsletter", type="primary"):
     
-    # Check for API Keys
-    if not os.getenv("ANTHROPIC_API_KEY") or not os.getenv("FIRECRAWL_API_KEY"):
-        st.error("Missing API Keys! Please ensure your .env file has ANTHROPIC_API_KEY and FIRECRAWL_API_KEY.")
+    # Check for API Keys in Streamlit Secrets
+    if not os.environ.get("ANTHROPIC_API_KEY") or not os.environ.get("FIRECRAWL_API_KEY"):
+        st.error("Missing API Keys! Please ensure your keys are saved in Streamlit Advanced Settings -> Secrets.")
         st.stop()
 
     with st.status("Initializing AI Agents...", expanded=True) as status_box:
         
-        # Initialize the Firecrawl Search Tool HERE
+        # Initialize the Firecrawl Search Tool safely INSIDE the button block
         firecrawl_search = FirecrawlSearchTool()
         
         # Configure Claude Sonnet 4.6
@@ -108,11 +100,6 @@ if st.button("Generate Weekly Newsletter", type="primary"):
         final_newsletter = newsletter_crew.kickoff()
         
         status_box.update(label="Newsletter Generated Successfully!", state="complete", expanded=False)
-
-    # 5. Display the final result
-    st.success("Draft Complete")
-    st.markdown("---")
-    st.markdown(final_newsletter.raw)
 
     # 5. Display the final result
     st.success("Draft Complete")
