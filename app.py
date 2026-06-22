@@ -97,7 +97,8 @@ if st.button("Generate Weekly Newsletter", type="primary"):
         newsletter_crew = Crew(
             agents=[researcher, analyst, strategist, editor],
             tasks=[task_research, task_analysis, task_ai, task_write],
-            process=Process.sequential
+            process=Process.sequential,
+            verbose=True
         )
 
         # Run the workflow
