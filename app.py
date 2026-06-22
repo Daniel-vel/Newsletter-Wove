@@ -44,7 +44,7 @@ if st.button("Generate Weekly Newsletter", type="primary"):
         
         # --- TERMINAL DIAGNOSTIC CHECKPOINTS ---
         print("📍 Checkpoint 1: Connecting to Anthropic...", flush=True)
-        my_llm = LLM(model="anthropic/claude-3-5-sonnet-20241022")
+        my_llm = LLM(model="claude-3-5-sonnet-20241022")
 
         print("📍 Checkpoint 2: Waking up the Market Researcher...", flush=True)
         st.write("🕵️‍♂️ Waking up the Market Researcher...")
