@@ -26,7 +26,10 @@ if st.button("Generate Weekly Newsletter", type="primary"):
 
     with st.status("Initializing AI Agents...", expanded=True) as status_box:
         
-        # Configure Claude 3.5 Sonnet
+        # Initialize the Firecrawl Search Tool HERE
+        firecrawl_search = FirecrawlSearchTool()
+        
+        # Configure Claude Sonnet 4.6
         llm_model = "anthropic/claude-sonnet-4-6"
 
         st.write("🕵️‍♂️ Waking up the Market Researcher...")
@@ -105,6 +108,11 @@ if st.button("Generate Weekly Newsletter", type="primary"):
         final_newsletter = newsletter_crew.kickoff()
         
         status_box.update(label="Newsletter Generated Successfully!", state="complete", expanded=False)
+
+    # 5. Display the final result
+    st.success("Draft Complete")
+    st.markdown("---")
+    st.markdown(final_newsletter.raw)
 
     # 5. Display the final result
     st.success("Draft Complete")
