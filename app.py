@@ -3,36 +3,32 @@ import os
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai_tools import FirecrawlSearchTool
 
-# 1. Stop CrewAI from phoning home (which prevents cloud freezing)
+# 1. Stop CrewAI from phoning home
 os.environ["CREWAI_DISABLE_TELEMETRY"] = "true"
 os.environ["CREWAI_DISABLE_TRACING"] = "true"
 
-# 2. Set up the Streamlit User Interface
+# 2. THE OVERRIDE: Force Streamlit Secrets directly into the server's OS environment
+try:
+    os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
+    os.environ["FIRECRAWL_API_KEY"] = st.secrets["FIRECRAWL_API_KEY"]
+except KeyError:
+    st.error("Missing API Keys! Please ensure your keys are saved in Streamlit Advanced Settings -> Secrets.")
+    st.stop()
+
+# 3. Set up the Streamlit User Interface
 st.set_page_config(page_title="Wove Competitive Intelligence", page_icon="📊", layout="centered")
 st.title("Wove Benchmarking & AI Newsletter Agent")
 st.markdown("Generates a weekly strategic newsletter comparing BNY's Wove against legacy banks and modern fintechs.")
 
-# 3. The Button that triggers the agents
+# 4. The Button that triggers the agents
 if st.button("Generate Weekly Newsletter", type="primary"):
-    
-    # Explicitly pull the keys directly from Streamlit Secrets
-    try:
-        anthropic_key = st.secrets["ANTHROPIC_API_KEY"]
-        firecrawl_key = st.secrets["FIRECRAWL_API_KEY"]
-    except KeyError:
-        st.error("Missing API Keys! Please ensure your keys are saved in Streamlit Advanced Settings -> Secrets.")
-        st.stop()
 
     with st.status("Initializing AI Agents...", expanded=True) as status_box:
         
-        # Pass the key explicitly to avoid the silent input prompt
-        firecrawl_search = FirecrawlSearchTool(api_key=firecrawl_key)
+        # Tools will now silently read from os.environ
+        firecrawl_search = FirecrawlSearchTool()
         
-        # Configure Claude using the explicit LLM class
-        my_llm = LLM(
-            model="anthropic/claude-3-5-sonnet-20241022",
-            api_key=anthropic_key
-        )
+        my_llm = LLM(model="anthropic/claude-3-5-sonnet-20241022")
 
         st.write("🕵️‍♂️ Waking up the Market Researcher...")
         researcher = Agent(
@@ -111,7 +107,7 @@ if st.button("Generate Weekly Newsletter", type="primary"):
         
         status_box.update(label="Newsletter Generated Successfully!", state="complete", expanded=False)
 
-    # 4. Display the final result
+    # 5. Display the final result
     st.success("Draft Complete")
     st.markdown("---")
     st.markdown(final_newsletter.raw)
