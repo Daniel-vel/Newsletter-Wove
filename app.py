@@ -20,9 +20,9 @@ if st.button("Generate Weekly Newsletter", type="primary"):
         
         # Initialize the Firecrawl Search Tool safely INSIDE the button block
         firecrawl_search = FirecrawlSearchTool()
-        
-        # Configure Claude Sonnet 4.6
-        llm_model = "anthropic/claude-sonnet-4-6"
+
+        # Configure Claude 3.5 Sonnet
+        llm_model = "anthropic/claude-3-5-sonnet-20241022"
 
         st.write("🕵️‍♂️ Waking up the Market Researcher...")
         researcher = Agent(
